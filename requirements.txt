@@ -1,0 +1,7 @@
+os
+dotenv
+numpy
+pandas
+langchain
+streamlit
+google-generativeai
