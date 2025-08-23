@@ -5,23 +5,38 @@ import streamlit as st
 
 load_dotenv()
 
-def call_llm_api(prompt, temperature=0.7, max_tokens=500) -> str:
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(prompt)
-    return response.text
+# Configure the Generative AI client at the start
+try:
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        st.error("`GOOGLE_API_KEY` not found in environment variables. Please set it in your .env file.")
+        st.stop()
+    genai.configure(api_key=api_key)
+except Exception as e:
+    st.error(f"Error configuring Generative AI: {e}")
+    st.stop()
 
+def call_llm_api(prompt: str, temperature: float = 0.7, max_tokens: int = 500) -> str:
+    """Calls the Gemini API and returns the response text."""
+    try:
+        # Use a valid and current model name
+        model = genai.GenerativeModel("gemini-1.5-flash-latest")
+        generation_config = genai.types.GenerationConfig(
+            temperature=temperature,
+            max_output_tokens=max_tokens
+        )
+        response = model.generate_content(prompt, generation_config=generation_config)
+        return response.text
+    except Exception as e:
+        st.error(f"An error occurred while calling the API: {e}")
+        return ""
 
 if __name__=="__main__":
-    prompt1="who is the prime minister of United States?"
-    # print(call_llm_api(prompt))s
-    st.title("welcome to the AI the Intelligence Platform")
-    prompt = st.text_input("enter the question here")
-    if st.button("send"):
-        response = call_llm_api(prompt)
-        # while response.text is null:
-        #     st.loader("answer generating...")
-        print(response )
-        st.markdown(response)
-    else:
-        st.text("hit send button to get the response")
+    st.title("AI Intelligence Platform")
+    prompt = st.text_input("Enter your question here:")
+
+    if st.button("Send") and prompt:
+        with st.spinner("Generating response..."):
+            response = call_llm_api(prompt)
+            if response:
+                st.markdown(response)
