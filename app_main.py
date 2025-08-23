@@ -25,7 +25,7 @@ def call_llm_api(prompt: str, temperature: float = 0.7, max_tokens: int = 500) -
             temperature=temperature,
             max_output_tokens=max_tokens
         )
-        response = model.generate_content(f"description: act as a code assist and generate response only if the prompt is related to code assist. if not strictly reply with fallback saying can't access the model for the question asked along with the user question, here is the prompt: {prompt}", generation_config=generation_config)
+        response = model.generate_content(f"description: act as a expert in all areas and generate response for the prompt in detailed way. here is the user prompt: {prompt}", generation_config=generation_config)
         return response.text
     except Exception as e:
         st.error(f"An error occurred while calling the API: {e}")
@@ -40,3 +40,4 @@ if __name__=="__main__":
             response = call_llm_api(prompt)
             if response:
                 st.markdown(response)
+
